@@ -11,7 +11,7 @@ pub struct ExtractionResult {
 }
 
 impl ExtractionResult {
-    pub fn node_sum_cost(&self, egraph: &EGraph, node: &TrigLanguage, costs: &FxHashMap<Id, Cost>) -> Cost {
+    pub fn node_sum_cost(&self, _egraph: &EGraph, node: &TrigLanguage, costs: &FxHashMap<Id, Cost>) -> Cost {
         NotNan::new(node_cost(node)).unwrap()
             + node
                 .children()
@@ -29,7 +29,7 @@ impl ExtractionResult {
 
 fn node_cost(enode: &TrigLanguage) -> f64 {
     let op_cost = match enode {
-        TrigLanguage::Constant(c) => 0.5,
+        TrigLanguage::Constant(_) => 0.5,
         TrigLanguage::Neg(_) => 1.0,
         TrigLanguage::Add(_) | TrigLanguage::Sub(_) => 1.0,
         TrigLanguage::Mul(_) | TrigLanguage::Div(_) => 5.0,

@@ -1,14 +1,13 @@
 use egg::*;
-use extract::BottomUpExtractor;
-use num::Float;
 use num::Signed;
 use num::Zero;
 use ordered_float::NotNan;
 use rustc_hash::FxHashMap;
-use rustc_hash::FxHashSet;
 
 use crate::complex::ComplexExpression;
 use crate::expression::Expression;
+
+#[cfg(test)]
 mod extract;
 
 pub type EGraph = egg::EGraph<TrigLanguage, ConstantFold>;
@@ -56,6 +55,7 @@ fn is_non_negative_conservative(var: &str) -> impl Fn(&mut EGraph, Id, &Subst) -
     }
 }
 
+#[allow(dead_code)]
 fn all_not_zero(vars: &[&str]) -> impl Fn(&mut EGraph, Id, &Subst) -> bool {
     let vars: Vec<_> = vars.iter().map(|v| v.parse().unwrap()).collect();
     move |egraph, _, subst| {
@@ -80,7 +80,6 @@ fn cmp<T: PartialOrd>(a: &Option<T>, b: &Option<T>) -> Ordering {
 
 use core::f64;
 use std::cmp::Ordering;
-use std::collections::HashSet;
 use std::collections::HashMap;
 
 struct SineExtractor<'a> {
@@ -177,7 +176,7 @@ impl<'a> SineExtractor<'a> {
 
     fn node_cost(&self, enode: &TrigLanguage) -> f64 {
         let op_cost = match enode {
-            TrigLanguage::Constant(c) => 0.5,
+            TrigLanguage::Constant(_) => 0.5,
             TrigLanguage::Neg(_) => 1.0,
             TrigLanguage::Add(_) | TrigLanguage::Sub(_) => 1.0,
             TrigLanguage::Mul(_) | TrigLanguage::Div(_) => 5.0,
@@ -287,6 +286,7 @@ impl<'a> TrigExprExtractor<'a> {
         enode.clone()
     }
 
+    #[allow(dead_code)]
     pub fn find_best_node(&self, eclass: Id) -> &TrigLanguage {
         &self.costs[&self.egraph.find(eclass)].1
     }
@@ -390,7 +390,7 @@ impl CostFunction<TrigLanguage> for TrigCostFn {
         C: FnMut(Id) -> Self::Cost
     {
         let op_cost = match enode {
-            TrigLanguage::Constant(c) => 0.5,
+            TrigLanguage::Constant(_) => 0.5,
             TrigLanguage::Neg(_) => 1.0,
             TrigLanguage::Add(_) | TrigLanguage::Sub(_) => 1.0,
             TrigLanguage::Mul(_) | TrigLanguage::Div(_) => 5.0,
@@ -984,6 +984,7 @@ pub fn extract_best_sine(expr: Expression) -> Option<Expression> {
     best.map(from_egg_expr)
 }
 
+#[allow(dead_code)]
 pub fn simplify_complex(expr: ComplexExpression) -> ComplexExpression {
     let ComplexExpression { real, imag } = expr;
 
@@ -1007,6 +1008,7 @@ pub fn simplify_complex(expr: ComplexExpression) -> ComplexExpression {
     ComplexExpression { real: real_simple, imag: imag_simple }
 }
 
+#[allow(dead_code)]
 pub fn simplify_matrix_no_context(matrix_expression: &Vec<Vec<ComplexExpression>>) -> Vec<Vec<ComplexExpression>> {
     let mut runner: Runner<TrigLanguage, ConstantFold> = Runner::default();
 
@@ -1155,7 +1157,10 @@ pub fn simplify_matrix_and_matvec(matrix_expression: &Vec<Vec<ComplexExpression>
     (simplified_matrix, simplified_matvec)
 }
 
+#[cfg(test)]
 use crate::UnitaryExpression;
+#[cfg(test)]
+use extract::BottomUpExtractor;
 
 #[test]
 fn test_simplify_matrix_and_matvec() {
@@ -1206,7 +1211,7 @@ fn test_simplify_matrix_and_matvec() {
     runner = runner.run(&make_rules());
     let extractor = BottomUpExtractor;
     let start = std::time::Instant::now();
-    let result = extractor.extract(&runner.egraph, &runner.roots);
+    let _result = extractor.extract(&runner.egraph, &runner.roots);
     let elapsed = start.elapsed();
     println!("Time taken: {:?}", elapsed);
 }
@@ -1261,6 +1266,7 @@ pub fn check_equality(expr: &Expression, expr2: &Expression) -> bool {
 }
 
 
+#[allow(dead_code)]
 fn print_equality(s1: &str, s2: &str) {
     let expr1: RecExpr<TrigLanguage> = s1.parse().unwrap();
     let expr2: RecExpr<TrigLanguage> = s2.parse().unwrap();
@@ -1276,6 +1282,7 @@ fn print_equality(s1: &str, s2: &str) {
     // }
 }
 
+#[allow(dead_code)]
 fn check_equality_lhs_only(s1: &str, s2: &str) -> bool {
     let expr1: RecExpr<TrigLanguage> = s1.parse().unwrap();
     let expr2: RecExpr<TrigLanguage> = s2.parse().unwrap();
@@ -1287,6 +1294,7 @@ fn check_equality_lhs_only(s1: &str, s2: &str) -> bool {
     runner.egraph.equivs(&expr1, &expr2).len() > 0
 }
 
+#[allow(dead_code)]
 fn check_equality_both(s1: &str, s2: &str) -> bool {
     let expr1: RecExpr<TrigLanguage> = s1.parse().unwrap();
     let expr2: RecExpr<TrigLanguage> = s2.parse().unwrap();
@@ -1371,7 +1379,7 @@ mod tests {
         let s2 = "(/ (- (* (~ (* (sin (* (pi) (0.25))) (sin (* (0.5) (- (θ) (λ)))))) (/ (cos (θ)) (sqrt (2)))) (* (* (sin (* (pi) (0.25))) (cos (* (0.5) (- (θ) (λ))))) (/ (sin (θ)) (sqrt (2))))) (+ (* (/ (cos (θ)) (sqrt (2))) (/ (cos (θ)) (sqrt (2)))) (* (/ (sin (θ)) (sqrt (2))) (/ (sin (θ)) (sqrt (2))))))";
         // let expr1: RecExpr<TrigLanguage> = s1.parse().unwrap();
         let expr2: RecExpr<TrigLanguage> = s2.parse().unwrap();
-        let mut runner: Runner<TrigLanguage, ConstantFold> = Runner::default()
+        let mut _runner: Runner<TrigLanguage, ConstantFold> = Runner::default()
             // .with_explanations_enabled()
             // .with_expr(&expr1)
             .with_expr(&expr2)

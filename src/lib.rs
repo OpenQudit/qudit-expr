@@ -5,21 +5,10 @@ mod unitary;
 mod codegen;
 mod analysis;
 
-use std::collections::VecDeque;
-use std::collections::BTreeSet;
-
 use analysis::check_many_equality;
 use complex::ComplexExpression;
 use expression::Expression;
-use itertools::Itertools;
-use qudit_core::c64;
-use qudit_core::unitary::UnitaryMatrix;
-use qudit_core::ComplexScalar;
-use qudit_core::RealScalar;
-use qudit_core::QuditRadices;
 use qudit_core::QuditSystem;
-use qudit_core::matrix::Row;
-use qudit_core::matrix::Col;
 pub use unitary::UnitaryExpression;
 pub use unitary::MatVecExpression;
 pub use unitary::UnitaryExpressionGenerator;
@@ -34,6 +23,7 @@ pub use analysis::simplify_matrix_and_matvec;
 
 use analysis::{check_equality, extract_best_sine};
 
+#[allow(dead_code)]
 fn formal_equivalence_check(guess: &UnitaryExpression, target: &UnitaryExpression) -> bool {
     let mut lhs_vec = Vec::new();
     let mut rhs_vec = Vec::new();
@@ -48,6 +38,7 @@ fn formal_equivalence_check(guess: &UnitaryExpression, target: &UnitaryExpressio
     check_many_equality(&lhs_vec, &rhs_vec)
 }
 
+#[allow(dead_code)]
 fn formal_equivalence_check_with_phase(guess: &UnitaryExpression, target: &UnitaryExpression, phase: &Expression) -> bool {
     let cis = ComplexExpression { real: Expression::Cos(Box::new(phase.clone())), imag: Expression::Sin(Box::new(phase.clone())) };
     let mut products = Vec::new();
@@ -73,6 +64,7 @@ fn formal_equivalence_check_with_phase(guess: &UnitaryExpression, target: &Unita
 }
 
 /// if congruent, guess = e^(i*phase)*target
+#[allow(dead_code)]
 fn formal_congruence_check_with_phase(guess: &UnitaryExpression, target: &UnitaryExpression) -> Option<Expression> {
     let mut non_zero_row_index = None;
     let mut non_zero_col_index = None;
@@ -133,11 +125,13 @@ fn formal_congruence_check_with_phase(guess: &UnitaryExpression, target: &Unitar
     Some(*phase)
 }
 
+#[allow(dead_code)]
 fn formal_congruence_check(guess: &UnitaryExpression, target: &UnitaryExpression) -> bool {
     formal_congruence_check_ratio(guess, target)
     // formal_congruence_check_determinant(guess, target)
 }
 
+#[allow(dead_code)]
 fn formal_congruence_check_ratio(guess: &UnitaryExpression, target: &UnitaryExpression) -> bool {
     // find first pair of non-zero elements
     // println!("Finding 1st non-zero pair");
@@ -220,6 +214,7 @@ fn formal_congruence_check_ratio(guess: &UnitaryExpression, target: &UnitaryExpr
     // check_many_equality(&lhs_vec, &rhs_vec)
 }
 
+#[allow(dead_code)]
 fn formal_congruence_check_determinant(guess: &UnitaryExpression, target: &UnitaryExpression) -> bool {
     let det_guess = guess.determinant().simplify();
     let phase_guess = if det_guess.real.is_one() {
@@ -302,7 +297,7 @@ mod tests {
         let u1 = u1.alpha_rename(0);
         let rz = rz.alpha_rename(0);
         let det_u1 = u1.determinant().simplify();
-        let det_rz = rz.determinant().simplify();
+        // let det_rz = rz.determinant().simplify();
         
         let sine = extract_best_sine(det_u1.imag.clone());
         assert!(sine.is_some());
@@ -426,21 +421,19 @@ mod tests {
         // Then find substitution by "unshelling" the expressions pairwise until one becomes the
         // variable
 
-        let mut e1 = u1.body[1][1].real.clone();
-        let mut e2 = u1d2.body[1][1].real.clone();
+        let e1 = u1.body[1][1].real.clone();
+        let e2 = u1d2.body[1][1].real.clone();
         // println!("{:?}", e1);
         // println!("{:?}", e2);
         // check that e1 discriminant is same as e2:
-        let mut original = None;
-        let mut substitution = None;
-        match (&e1, &e2) {
+        let (substitution, original) = match (&e1, &e2) {
             (Expression::Cos(e1), Expression::Cos(e2)) => {
                 // println!("cos");
                 println!("{:?} = {:?}", e1, e2);
-                (substitution, original) = (Some(e1.clone()), Some(e2.clone()));
+                (Some(e1.clone()), Some(e2.clone()))
             },
             _ => panic!("Expected cosine expression"),
-        }
+        };
 
         let original = original.unwrap();
         let substitution = substitution.unwrap();
@@ -449,8 +442,8 @@ mod tests {
         println!("{:?}", e1);
         println!("{:?}", e2);
 
-        let mut e1 = u1.body[1][1].imag.clone();
-        let mut e2 = u1d2.body[1][1].imag.clone();
+        let e1 = u1.body[1][1].imag.clone();
+        let e2 = u1d2.body[1][1].imag.clone();
         e2.substitute(&original, &substitution);
         println!("{:?}", e1);
         println!("{:?}", e2);

@@ -1,6 +1,5 @@
 use criterion::criterion_group;
 use criterion::criterion_main;
-use criterion::BenchmarkId;
 use criterion::Criterion;
 
 use qudit_core::c64;
@@ -57,7 +56,7 @@ pub fn cnotu3u3_benchmarks(c: &mut Criterion) {
             let u3_gate = U3Gate;
             let expr = u3_gate.gen_expr();
 
-            let module: Module<c64> = ModuleBuilder::new("test", DifferentiationLevel::Gradient)
+            let _module: Module<c64> = ModuleBuilder::new("test", DifferentiationLevel::Gradient)
                 .add_expression_with_stride(expr, 2)
                 .build();
         })
@@ -68,7 +67,7 @@ pub fn cnotu3u3_benchmarks(c: &mut Criterion) {
             let cnot_gate = CNOTGate;
             let expr = cnot_gate.gen_expr();
 
-            let module: Module<c64> = ModuleBuilder::new("test", DifferentiationLevel::Gradient)
+            let _module: Module<c64> = ModuleBuilder::new("test", DifferentiationLevel::Gradient)
                 .add_expression_with_stride(expr, 4)
                 .build();
         })
@@ -84,7 +83,7 @@ pub fn cnotu3u3_benchmarks(c: &mut Criterion) {
 
             let cnotu3u3_expr = cnot_expr.dot(&u3_expr.otimes(&u3_expr));
 
-            let module: Module<c64> = ModuleBuilder::new("test", DifferentiationLevel::Gradient)
+            let _module: Module<c64> = ModuleBuilder::new("test", DifferentiationLevel::Gradient)
                 .add_expression_with_stride(cnotu3u3_expr, 4)
                 .build();
         })
@@ -117,9 +116,9 @@ pub fn cnotu3u3eval_benchmarks(c: &mut Criterion) {
     let cnot_func = module.get_function(&cnot_name).unwrap();
     let cnotu3u3_func = module.get_function(&cnotu3u3_name).unwrap();
 
-    let u3_ptr = unsafe { u3_out_utry.as_mut().as_ptr_mut() as *mut f64};
-    let cnot_ptr = unsafe { cnot_out_utry.as_mut().as_ptr_mut() as *mut f64};
-    let cnotu3u3_ptr = unsafe { cnotu3u3_out_utry.as_mut().as_ptr_mut() as *mut f64 };
+    let u3_ptr = u3_out_utry.as_mut().as_ptr_mut() as *mut f64;
+    let cnot_ptr = cnot_out_utry.as_mut().as_ptr_mut() as *mut f64;
+    let cnotu3u3_ptr = cnotu3u3_out_utry.as_mut().as_ptr_mut() as *mut f64;
 
     let params = vec![1.7, 2.3, 3.1, 3.1, 2.3, 1.7f64];
     c.bench_function("u3-eval", |b| {
@@ -176,12 +175,12 @@ pub fn cnotu3u3evalgrad_benchmarks(c: &mut Criterion) {
     let cnot_func = module.get_function_and_gradient(&cnot_name).unwrap();
     let cnotu3u3_func = module.get_function_and_gradient(&cnotu3u3_name).unwrap();
 
-    let u3_ptr = unsafe { u3_out_utry.as_mut().as_ptr_mut() as *mut f64};
-    let cnot_ptr = unsafe { cnot_out_utry.as_mut().as_ptr_mut() as *mut f64};
-    let cnotu3u3_ptr = unsafe { cnotu3u3_out_utry.as_mut().as_ptr_mut() as *mut f64 };
-    let u3_grad_ptr = unsafe { u3_out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64 };
-    let cnot_grad_ptr = unsafe { cnot_out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64 };
-    let cnotu3u3_grad_ptr = unsafe { cnotu3u3_out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64 };
+    let u3_ptr = u3_out_utry.as_mut().as_ptr_mut() as *mut f64;
+    let cnot_ptr = cnot_out_utry.as_mut().as_ptr_mut() as *mut f64;
+    let cnotu3u3_ptr = cnotu3u3_out_utry.as_mut().as_ptr_mut() as *mut f64;
+    let u3_grad_ptr = u3_out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64;
+    let cnot_grad_ptr = cnot_out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64;
+    let cnotu3u3_grad_ptr = cnotu3u3_out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64;
 
     let params = vec![1.7, 2.3, 3.1, 3.1, 2.3, 1.7f64];
     c.bench_function("u3-eval-grad", |b| {

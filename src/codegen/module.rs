@@ -47,11 +47,11 @@ pub struct Module<C: ComplexScalar> {
     module: LLVMModuleRef,
     context: Context,
     phantom: std::marker::PhantomData<C>,
-    diff_lvl: DifferentiationLevel,
+    _diff_lvl: DifferentiationLevel,
 }
 
 impl<C: ComplexScalar> Module<C> {
-    pub fn new(module_name: &str, diff_lvl: DifferentiationLevel) -> Self {
+    pub fn new(module_name: &str, _diff_lvl: DifferentiationLevel) -> Self {
         unsafe {
             let core_context = LLVMContextCreate();
             
@@ -84,7 +84,7 @@ impl<C: ComplexScalar> Module<C> {
                 module: core_module,
                 engine: execution_engine,
                 phantom: std::marker::PhantomData,
-                diff_lvl,
+                _diff_lvl,
             }
         }
     }

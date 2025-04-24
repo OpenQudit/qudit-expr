@@ -38,7 +38,7 @@ impl Expression {
 
                 nrows
             }
-            Expression::Binary { op, lhs, rhs } => {
+            Expression::Binary { op: _op, lhs, rhs } => {
                 let lhs_dim = lhs.dim();
                 let rhs_dim = rhs.dim();
 
@@ -56,7 +56,7 @@ impl Expression {
                 }
             }
             Expression::Unary { expr, .. } => expr.dim(),
-            Expression::Call { fn_name, args, .. } => {
+            Expression::Call { fn_name: _fn_name, args, .. } => {
                 for arg in args.iter() {
                     assert!(
                         arg.dim() == args[0].dim(),

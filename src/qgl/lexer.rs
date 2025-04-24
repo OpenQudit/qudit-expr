@@ -34,6 +34,7 @@ pub(self) fn is_greek_letter(c: char) -> bool {
     c == '\u{03B4}' // Special case for lowercase delta (δ)
 }
 
+#[allow(dead_code)]
 pub struct LexError {
     pub error: &'static str,
     pub index: usize,

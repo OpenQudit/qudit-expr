@@ -10,6 +10,7 @@ struct CompilableUnitaryUnit {
 }
 
 impl CompilableUnitaryUnit {
+    #[allow(dead_code)]
     pub fn new(expr: UnitaryExpression, col_stride: usize) -> Self {
         let mat_idx_to_offset_map = move |row: usize, col: usize| -> usize {
             2 * (col * col_stride + row)
@@ -173,11 +174,11 @@ mod tests {
         println!("{}", module);
 
         let u3_grad_combo_func = module.get_function_and_gradient("U3").unwrap();
-        let out_ptr = unsafe { out_utry.as_mut().as_ptr_mut() as *mut f64 };
-        let out_grad_ptr = unsafe { out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64 };
+        let out_ptr = out_utry.as_mut().as_ptr_mut() as *mut f64;
+        let out_grad_ptr = out_grad.as_mut().as_mut_ptr().as_ptr() as *mut f64;
 
         let start = std::time::Instant::now();
-        for i in 0..1000000 {
+        for _ in 0..1000000 {
             unsafe { u3_grad_combo_func.call(params.as_ptr(), out_ptr, out_grad_ptr); }
         }
         let duration = start.elapsed();

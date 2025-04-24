@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::collections::HashSet;
 use num::bigint::BigInt;
 use num::rational::Ratio;
-use num::Integer;
 use num::ToPrimitive;
 use num::FromPrimitive;
 use qudit_core::RealScalar;
@@ -67,7 +66,7 @@ impl Expression {
         let inner = match self {
             Expression::Pi => "pi".to_string(),
             Expression::Variable(var) => var.clone(),
-            Expression::Constant(c) => self.to_float().to_string(),
+            Expression::Constant(_c) => self.to_float().to_string(),
             Expression::Neg(expr) => format!("~ {}", expr.to_string()),
             Expression::Add(lhs, rhs) => format!("+ {} {}", lhs.to_string(), rhs.to_string()),
             Expression::Sub(lhs, rhs) => format!("- {} {}", lhs.to_string(), rhs.to_string()),
@@ -83,7 +82,7 @@ impl Expression {
 
     /// Hard in general: https://math.stackexchange.com/questions/164221/period-of-the-sum-product-of-two-functions
     /// Start with simiplier problem
-    pub fn calculate_period<R: RealScalar>(&self, var: &str) -> Option<std::ops::Range<R>> {
+    pub fn calculate_period<R: RealScalar>(&self, _var: &str) -> Option<std::ops::Range<R>> {
         todo!()
     }
 
@@ -166,7 +165,7 @@ impl Expression {
             Expression::Pow(lhs, rhs) => lhs.is_zero_fast() && !rhs.is_zero_fast(),
             Expression::Sqrt(expr) => expr.is_zero_fast(),
             Expression::Sin(expr) => expr.is_zero_fast(),
-            Expression::Cos(expr) => false,
+            Expression::Cos(_expr) => false,
             Expression::Pi => false,
             Expression::Variable(_) => false,
         }
@@ -182,7 +181,7 @@ impl Expression {
             Expression::Sub(lhs, rhs) => lhs.is_one() && rhs.is_zero(),
             Expression::Mul(lhs, rhs) => lhs.is_one() && rhs.is_one(),
             Expression::Div(lhs, rhs) => lhs == rhs && !rhs.is_zero(),
-            Expression::Pow(lhs, rhs) => lhs.is_one(),
+            Expression::Pow(lhs, _rhs) => lhs.is_one(),
             Expression::Sqrt(expr) => expr.is_one(),
             Expression::Sin(expr) => !expr.is_parameterized() && (expr.eval::<f64>(&HashMap::new()) - std::f64::consts::PI / 2.0) < 1e-6,
             Expression::Cos(expr) => expr.is_zero(),
@@ -194,16 +193,16 @@ impl Expression {
     pub fn is_one_fast(&self) -> bool {
         match self {
             Expression::Constant(c) => *c.numer() == *c.denom(),
-            Expression::Neg(expr) => false,
+            Expression::Neg(_expr) => false,
             Expression::Add(lhs, rhs) => {
                 lhs.is_one_fast() && rhs.is_zero_fast() || lhs.is_zero_fast() && rhs.is_one_fast()
             }
             Expression::Sub(lhs, rhs) => lhs.is_one_fast() && rhs.is_zero_fast(),
             Expression::Mul(lhs, rhs) => lhs.is_one_fast() && rhs.is_one_fast(),
             Expression::Div(lhs, rhs) => lhs.is_one_fast() && rhs.is_one_fast(),
-            Expression::Pow(lhs, rhs) => lhs.is_one_fast(),
+            Expression::Pow(lhs, _rhs) => lhs.is_one_fast(),
             Expression::Sqrt(expr) => expr.is_one_fast(),
-            Expression::Sin(expr) => false,
+            Expression::Sin(_expr) => false,
             Expression::Cos(expr) => expr.is_zero_fast(),
             Expression::Pi => false,
             Expression::Variable(_) => false,

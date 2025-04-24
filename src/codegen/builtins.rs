@@ -20,6 +20,7 @@ impl Builtins {
         }
     }
 
+    #[allow(dead_code)]
     pub fn to_str(&self) -> &str {
         match self {
             Self::COS => "cos",
@@ -29,6 +30,7 @@ impl Builtins {
         }
     }
 
+    #[allow(dead_code)]
     pub fn arity(&self) -> usize {
         match self {
             Self::COS | Self::SIN | Self::SQRT => 1,

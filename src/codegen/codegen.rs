@@ -262,25 +262,25 @@ impl<'ctx, C: ComplexScalar> CodeGenerator<'ctx, C> {
         fn_value
     }
 
-    fn get_expression(&mut self, name: &str) -> Option<FloatValue<'ctx>> {
-        if let Some(c) = self.expressions.get(name) {
-            return Some(c.clone());
-        }
+    // fn get_expression(&mut self, name: &str) -> Option<FloatValue<'ctx>> {
+    //     if let Some(c) = self.expressions.get(name) {
+    //         return Some(c.clone());
+    //     }
 
-        let c = match name {
-            "pi" => Some(self.float_type().const_float(std::f64::consts::PI)),
-            "π" => Some(self.float_type().const_float(std::f64::consts::PI)),
-            "e" => Some(self.float_type().const_float(std::f64::consts::E)),
-            _ => None
-        };
+    //     let c = match name {
+    //         "pi" => Some(self.float_type().const_float(std::f64::consts::PI)),
+    //         "π" => Some(self.float_type().const_float(std::f64::consts::PI)),
+    //         "e" => Some(self.float_type().const_float(std::f64::consts::E)),
+    //         _ => None
+    //     };
 
-        if let Some(c) = c {
-            self.expressions.insert(name.to_string(), c);
-            return Some(c);
-        }
+    //     if let Some(c) = c {
+    //         self.expressions.insert(name.to_string(), c);
+    //         return Some(c);
+    //     }
 
-        None
-    }
+    //     None
+    // }
 
 
     pub fn gen_utry_func(

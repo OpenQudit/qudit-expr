@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::ops::Range;
 
-use qudit_core::c64;
 use qudit_core::matrix::Mat;
 use qudit_core::matrix::MatMut;
 use qudit_core::matrix::MatVecMut;
@@ -19,7 +18,6 @@ use qudit_core::ToRadices;
 use faer::reborrow::ReborrowMut;
 
 use crate::analysis::simplify_matrix;
-use crate::analysis::simplify_matrix_no_context;
 use crate::complex::ComplexExpression;
 use crate::expression::Expression;
 use crate::qgl::parse_unitary;
@@ -286,7 +284,7 @@ impl UnitaryExpression {
         let mut grad_exprs = vec![vec![Vec::with_capacity(self.body.len()); self.body.len()]; self.variables.len()];
         for (m, var) in self.variables.iter().enumerate() {
             for (i, row) in self.body.iter().enumerate() {
-                for (j, expr) in row.iter().enumerate() {
+                for (_j, expr) in row.iter().enumerate() {
                     grad_exprs[m][i].push(expr.differentiate(var));
                 }
             }
@@ -471,7 +469,7 @@ impl UnitaryExpression {
         }
 
         // swap cols
-        for (i, row) in new_body.iter_mut().enumerate() {
+        for (_i, row) in new_body.iter_mut().enumerate() {
             let new_row = (0..row.len()).map(|j| row[index_perm[j]].clone()).collect();
             *row = new_row;
         }
@@ -484,12 +482,13 @@ impl UnitaryExpression {
         }
     }
 
+    //TODO: Rename this to emplace
     pub fn extend(&self, placement: &[usize], radices: &QuditRadices) -> Self {
         assert!(placement.len() == self.num_qudits());
         assert!(placement.iter().enumerate().all(|(i, &p)| self.radices[i] == radices[p]));
 
         // kron with idenity to make this appropriately sized
-        let missing: QuditRadices = radices.clone().into_iter().enumerate().filter(|(i, r)| !placement.contains(i)).map(|(_, r)| *r).collect::<QuditRadices>();
+        let missing: QuditRadices = radices.clone().into_iter().enumerate().filter(|(i, _)| !placement.contains(i)).map(|(_, r)| *r).collect::<QuditRadices>();
         let extended = if missing.is_empty() {
             self.clone()
         } else {

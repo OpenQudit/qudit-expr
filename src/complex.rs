@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 
-use qudit_core::c64;
 use qudit_core::ComplexScalar;
 
 use crate::expression::Expression;
